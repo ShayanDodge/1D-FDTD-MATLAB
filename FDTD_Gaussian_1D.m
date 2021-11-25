@@ -12,7 +12,7 @@
 clc
 close all;
 
-%% some constants
+% some constants
 mu_0 = 1.2566370614359173e-06;   
 eps_0= 8.8541878176203892e-12;   
 C=299792458.0;      % speed of light
