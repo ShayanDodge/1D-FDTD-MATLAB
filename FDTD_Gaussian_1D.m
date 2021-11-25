@@ -8,24 +8,23 @@
 % FDTD 1D in free space with CPML 
 % Gaussian
 %===================================
-
 clc
 close all;
-
+%===================================
 % some constants
 mu_0 = 1.2566370614359173e-06;   
 eps_0= 8.8541878176203892e-12;   
 C=299792458.0;      % speed of light
-
-%% wave definition
+%===================================
+% wave definition
 amptidute=100;
 frequency=110E9;
 T=1/frequency;
 lambda=C*T;
 t0=4*T;
 omega=2*pi*frequency;
-
-%% FDTD variables
+%===================================
+% FDTD variables
 if exist('zZoneSize','var')==0
     zZoneSize=4;
 else if zZoneSize<0
@@ -41,8 +40,8 @@ end
 domainLength=zZoneSize*lambda;
 totalTime=tZoneSize*T;
 numberCellsPerWavelength=200;
-
-%% CPML parameters
+%===================================
+% CPML parameters
 pmlWidth=40;
 pmlOrder=4;
 epsR=1;
@@ -50,8 +49,8 @@ sigmaMax=1;
 kappaMax=15;
 alphaMax=0.24;
 alphaOrder=1;
-
-%% domain definition
+%===================================
+% domain definition
 dz=lambda/numberCellsPerWavelength;
 dt=dz/2/C;
 totalTimeStep=floor(totalTime/dt);
@@ -62,20 +61,20 @@ ksource = nz-pmlWidth-35;
 %% FDTD EM field arrarys
 Ex=zeros(1,nzp1);
 Hy=zeros(1,nz);
-
-%% Coeficient for EM field updating
+%===================================
+% Coeficient for EM field updating
 Cexe=1;
 Cexhy=-dt/eps_0/dz;
 Chyh=1;
 Chyex=-dt/mu_0/dz;
-
-%% CPML arrays
+%===================================
+% CPML arrays
 Psi_Ezy_zn=zeros(1,pmlWidth);
 Psi_Ezy_zp=zeros(1,pmlWidth);
 Psi_Hzx_zn=zeros(1,pmlWidth);
 Psi_Hzx_zp=zeros(1,pmlWidth);
-
-%% initial PML update coeficients
+%===================================
+% initial PML update coeficients
 sigmaOpt=sigmaMax*(pmlOrder+1)/(sqrt(epsR)*150*pi*dz);
 % zn side
 rho_e=((pmlWidth:-1:1)-0.75)/pmlWidth;
@@ -127,28 +126,28 @@ b=0;%sigma_m*dt/2/mu_0;
 Chyh_zp=(1-b)./(1+b);
 CPsi_Hzx_zp=-dt./(1+b)/mu_0;
 Chyex_zp=CPsi_Hzx_zp./kappa_m/dz;
-
-%% FDTD loop
-
+%===================================
+% ===== FDTD loop ==================
+%===================================
 % some constants
-%====== Gaussian Source ===========
+%====== Gaussian Source ============
 dtDivEps0DivDz=dt/eps_0/dz;
 muSource=dtDivEps0DivDz*amptidute * -2.0 /T/T;
-%====== Sine Source ===========
+%====== Sine Source ================
 % dtDivEps0DivDz=dt/eps_0/dz;
 % muSource=dtDivEps0DivDz*amptidute * 2.0*pi*omega;
-
+%===================================
 % initial plot
 figure;
 h=plot(Ex);
 set(gca,'ylim',[-2 2.5]*1e15);
 set(gca,'xlim',[pmlWidth (nz-pmlWidth)]);
 grid on;
-
+%===================================
 % point to test performace of CPML
 ic=ksource+30;
 cEx=zeros(1,totalTimeStep);
-
+%===================================
 % fdtd loop
 for n=1:totalTimeStep
     %============================
@@ -169,7 +168,6 @@ for n=1:totalTimeStep
     end
     % non pml region
     Hy(pmlWidth+1:nz-pmlWidth)=Chyh* Hy(pmlWidth+1:nz-pmlWidth)+Chyex*( Ex(pmlWidth+2:nzp1-pmlWidth)-Ex(pmlWidth+1:nz-pmlWidth)); 
-    
     %===========================
     % update Ex
     %===========================
@@ -189,14 +187,12 @@ for n=1:totalTimeStep
     end
     % non pml region
     Ex(pmlWidth+2:nz-pmlWidth)=Cexe* Ex(pmlWidth+2:nz-pmlWidth)+Cexhy*( Hy(pmlWidth+2:nz-pmlWidth)-Hy(pmlWidth+1:nzm1-pmlWidth)); 
-    
     %==========================
     % update source
     %==========================
     Ex(ksource)=Ex(ksource)+muSource *(n * dt - t0)...
                     * exp(-(((n * dt - t0) / T).^2)); % Differentiated Gaussian pulse
-%     Ex(ksource)=Ex(ksource)-amptidute *sin((n * dt - t0) * omega)/dz; % Sine source
-                
+%   Ex(ksource)=Ex(ksource)-amptidute *sin((n * dt - t0) * omega)/dz; % Sine source        
     %==========================
     % update figure
     %==========================
@@ -205,7 +201,6 @@ for n=1:totalTimeStep
         title(gca,strcat('time step :' ,int2str(n)));
         pause(0.2);
     end
-    
     %=========================
     % sample watched field
     %=========================
