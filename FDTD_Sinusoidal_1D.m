@@ -1,9 +1,7 @@
 %===================================
 %    Shayan Dodge
 %    MSc in Physics
-% M: +98 935 741 67 63 
 % E: dodgeshayan@gmail.com 
-% A: Tehran, Iran 
 %===================================
 % FDTD 1D in free space with CPML 
 % Sinusoidal
@@ -207,3 +205,4 @@ for n=1:totalTimeStep
     %=========================
     cEx(n)=Ex(ic);    
 end
+
